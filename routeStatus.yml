@@ -1,0 +1,14 @@
+---
+RouteTable:
+  rpc: get-route-information
+  args_key: destination
+  item: route-table/rt
+  key: rt-destination
+  view: CurSelView
+
+CurSelView:
+  groups:
+    nh: 'rt-entry[current-active]/nh[selected-next-hop]'
+  fields_nh:
+    to: to
+    via: via
