@@ -31,6 +31,19 @@ class SRXDevice():
         self.dev.close()
 
 
+class Chooser:
+    def sel_1(self):
+        print('Im 1')
+
+    def sel_2(self):
+        print('Im 2')
+
+    def dispatch(self, value):
+        method_name = 'sel_' + str(value)
+        method = getattr(self, method_name)
+        return method()
+
+
 def main():
 
     devices = []
@@ -41,7 +54,10 @@ def main():
         dev.connect()
 
     print('Wait for input')
+
     x = int(input())
+    ch = Chooser()
+    ch.dispatch(x)
 
     for dev in devices:
         dev.get_route()
