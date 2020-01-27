@@ -12,16 +12,17 @@ set system services netconf ssh
 
 
 class SRXDevice():
-    def __init__(self, address, un, passw):
+    def __init__(self, name, address, un, passw):
         self.yml_file = "routeStatus.yml"
         globals().update(loadyaml(self.yml_file))
         self.dev = Device(host=address, user=un, passwd=passw)
-        self.name = ''
+        self.name = name
         self.version = ''
 
     def connect(self):
-        print('Wait for connections')
+        print(self.name, 'wait for connections')
         self.dev.open()
+        print(self.name, 'connected!')
 
     def get_route(self):
         tbl = RouteTable(self.dev)
@@ -75,8 +76,8 @@ devices = []
 def main():
     global selected_Dev, devices
 
-    for adr in SRXAddresses:
-        devices.append(SRXDevice(adr, username, password))
+    for name, adr in SRXAddresses.items():
+        devices.append(SRXDevice(name, adr, username, password))
 
     for dev in devices:
         dev.connect()
