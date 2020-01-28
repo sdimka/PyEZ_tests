@@ -2,46 +2,88 @@
 """
 yml
 """
+from multiprocessing.dummy import Process, Pool
+import time
+from timeit import Timer
+import os
+
+from jnpr.junos import Device
 from jnpr.junos.factory import loadyaml
-
-yml_file = "stp.yml"
-globals().update(loadyaml(yml_file))
-
-tbl = STPInterfaces(dev)
-tbl.get()
-for key in tbl:
-    print(key.name, key.role, key.state)
-
-#   pprint(dev.facts)
-
-# tbl = STPI
+from config import username, password, SRXAddresses
 
 
-from jnpr.junos.op.routes import RouteTable
+class SomeData:
+    def __init__(self, name, address, un, passw):
+        self.yml_file = "routeStatus.yml"
+        globals().update(loadyaml(self.yml_file))
+        self.dev = Device(host=address, user=un, passwd=passw)
+        self.name = name
+        self.version = ''
+        self.address = address
 
-routes = RouteTable(dev)
+        self.param = os.getpid()
+        self.param2 = 0
 
-routes.get()
-# pprint(routes.keys())
+    def uppdate_param(self):
+        self.param2 += 1000
 
-tbl = routes.get('192.168.0.0/24')
-
-for key in tbl:
-    for val in key.values():
-        print(val.__class__)
-    print(key.values())
+    def print_th(self):
+        self.param2 = (os.getpid())
 
 
-# pprint(routes.keys())
-RouteTable:
-  rpc: get-route-information
-  item: route-table/rt/rt-entry/nh
-  key: rt-destination
-  view: RouteTableView
+def update_in_pool(coll):
+    pool1 = Pool()
+    result = pool1.map(worker, coll)
+    pool1.close()
+    pool1.join()
+    return result
 
-RouteTableView:
-  groups:
-    entry: rt-entry
-  fields_entry:
-    nexthop: nh/to
-    selected: nh/selected-next-hop
+
+def gen_list(pss):
+    time.sleep(2)
+    # print(pss[0], pss[1])
+    sd = SomeData(pss[0], pss[1], username, password)
+    sd.uppdate_param()
+    # sd.uppdate_param()
+    return sd
+
+
+def update_data(qq, wp: SomeData):
+    wp.print_th()
+    print(wp)
+    qq.put(wp)
+
+
+collect = [['First', '192.168.0.50'],
+           ['Second', '192.168.0.51'],
+           ['Third', '192.168.0.52'],
+           ['Fourth', '192.168.0.53'],
+           ['Fifth', '192.168.0.54']]
+arr = []
+
+
+def main():
+    pool = Pool()
+    results = pool.map(gen_list, collect)
+
+    for r in results:
+        print(r.name, r.address, r.param, r.param2)
+
+if __name__ == "__main__":
+
+    # processes = [
+    #     Process(target=gen_list, args=(q, name, adr, username, password,))
+    #     for name, adr in SRXAddresses.items()
+    # ]
+    main()
+
+
+    # for p in processes:
+    #     p.start()
+    # for p in processes:
+    #     p.join()
+
+
+
+
+

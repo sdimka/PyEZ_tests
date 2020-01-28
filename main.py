@@ -2,6 +2,7 @@ from pprint import pprint
 from jnpr.junos import Device
 from jnpr.junos.factory import loadyaml
 from jnpr.junos.utils.start_shell import StartShell
+from multiprocessing.dummy import Process, Pool
 
 from config import username, password, SRXAddresses
 
@@ -44,6 +45,9 @@ class SRXDevice():
         print('Close connection')
         self.dev.close()
 
+    def get_status(self):
+        return self.dev.connected
+
 
 class Chooser:
     def sel_1(self):
@@ -63,10 +67,21 @@ class Chooser:
         global selected_Dev, devices
         devices[selected_Dev].clear_ospf()
 
+    def sel_4(self):
+        global selected_Dev, devices
+        print(devices[selected_Dev].get_status())
+
     def dispatch(self, value):
         method_name = 'sel_' + str(value)
         method = getattr(self, method_name)
         return method()
+
+
+def gen_list(n):
+    sd = SRXDevice(n[0], n[1], username, password)
+    sd.connect()
+    sd.get_version()
+    return sd
 
 
 selected_Dev = 1
@@ -76,18 +91,14 @@ devices = []
 def main():
     global selected_Dev, devices
 
-    for name, adr in SRXAddresses.items():
-        devices.append(SRXDevice(name, adr, username, password))
-
-    for dev in devices:
-        dev.connect()
-        dev.get_version()
+    pool = Pool()
+    devices = pool.map(gen_list, SRXAddresses)
 
     x = 1
     ch = Chooser()
-    while x != 4:
+    while x != 5:
         ch.dispatch(x)
-        print('1 - Select device, 2 - Get info, 3 - Clear OSPF, 4 - exit')
+        print('1 - Select device, 2 - Get info, 3 - Clear OSPF, 4 - Status, 5 - exit')
         x = int(input())
 
     # for dev in devices:
@@ -98,4 +109,13 @@ def main():
 
 
 if __name__ == '__main__':
+    #global selected_Dev, devices
+
+    #for name, adr in SRXAddresses.items():
+    #    devices.append(SRXDevice(name, adr, username, password))
+
+    #for dev in devices:
+    #    dev.connect()
+    #    dev.get_version()
+
     main()
