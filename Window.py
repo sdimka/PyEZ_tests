@@ -4,27 +4,25 @@
 Main window app
 """
 
-from tkinter import Tk, Text, BOTH, W, N, E, S, X, Y, StringVar
+from tkinter import Tk, Toplevel, Text, BOTH, W, N, E, S, X, Y, StringVar
 from tkinter.ttk import Frame, Button, Label, Style, Progressbar
 
 
 class SubFrame(Frame):
-    def __init__(self, parent : Frame, name, param1, param2):
-        super().__init__()
+    def __init__(self, parent, name, param1, param2):
+        super().__init__(parent)
         self.parent = parent
 
         self.name = name
         self.param1 = StringVar()
         self.param1.set(param1)
         self.param2 = param2
-        self.lbl1 = Label()
         self.status = False
 
         self.initUI()
 
-
     def initUI(self):
-        self.pack(fill=BOTH, expand=True)
+        self.pack(fill=X, expand=True)
 
         self['padding'] = (5, 10)
         self['borderwidth'] = 4
@@ -66,12 +64,11 @@ class SubFrame(Frame):
             self.status = False
 
 
-
-class Example(Frame):
+class MainWindow(Toplevel):
     def __init__(self, parent):
-        super().__init__()
+        Toplevel.__init__(self, parent)
+        self.protocol('WM_DELETE_WINDOW', self.master.destroy)
 
-        self.parent = parent
         self.var = StringVar()
         self.var.set('Some text')
 
@@ -79,8 +76,7 @@ class Example(Frame):
 
     def initUI(self):
 
-        self.parent.title("Test app title")
-        self.pack(fill=BOTH, expand=True)
+        self.title("Test app title")
 
         frame1 = Frame(self)
         frame1.pack(fill=X, expand=True)
@@ -105,11 +101,13 @@ class Example(Frame):
         obtn = Button(frame1, text="OK", command=self.onTestClick)
         obtn.grid(row=2, column=3)
 
-        frames = []
-        for i in range(1, 4):
-            fr = SubFrame(frame1, f'Name {i}', 'Param1', 'Param2')
-            fr.pack(fill=X, expand=True)
-            frames.append(fr)
+        # frames = []
+        # for i in range(1, 4):
+        #     fr = SubFrame(self, f'Name {i}', 'Param1', 'Param2')
+        #     fr.pack(fill=X, expand=True)
+        #     frames.append(fr)
+
+
 
     def onExit(self):
         self.quit()
@@ -119,10 +117,9 @@ class Example(Frame):
 
 
 def main():
-
     root = Tk()
     #root.geometry("350x300+300+300")
-    app = Example(root)
+    app = MainWindow(root)
     root.mainloop()
 
 
