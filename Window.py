@@ -4,8 +4,9 @@
 Main window app
 """
 
-from tkinter import Tk, Toplevel, Text, BOTH, W, N, E, S, X, Y, StringVar
+from tkinter import Tk, Toplevel, Text, BOTH, W, N, E, S, X, Y, StringVar, PhotoImage
 from tkinter.ttk import Frame, Button, Label, Style, Progressbar
+from functools import partial
 
 
 class SubFrame(Frame):
@@ -19,6 +20,14 @@ class SubFrame(Frame):
         self.param2 = param2
         self.status = False
 
+        handler_start = partial(self.runProgress, message='Text')
+        self.bind('<<UpdateStart>>', handler_start)
+        handler_stop = partial(self.stopProgress)
+        self.bind('<<UpdateStop>>', handler_stop)
+
+        self.img_bad = PhotoImage(file='bad.png')
+        self.img_good = PhotoImage(file='good.png')
+
         self.initUI()
 
     def initUI(self):
@@ -27,41 +36,55 @@ class SubFrame(Frame):
         self['padding'] = (5, 10)
         self['borderwidth'] = 4
         self['relief'] = 'ridge'
-        # style = Style()  # Create style
-        # style.configure("Blue.TFrame", background="green")  # Set bg color
-        # self.config(style='Blue.TFrame')  # Apply style to widget
+
+        self.lbl0 = Label(self, image=self.img_bad)
+        self.lbl0.image = self.img_bad
+        self.lbl0.grid(row=0, column=0, sticky=W, pady=4, padx=5)
 
         lbl = Label(self, text=self.name)
-        lbl.grid(row=0, column=0, sticky=W, pady=4, padx=5)
+        lbl.grid(row=0, column=1, sticky=W, pady=4, padx=5)
 
         self.lbl1 = Label(self, textvariable=self.param1, foreground="blue")
-        self.lbl1.grid(row=0, column=1, sticky=W, pady=4, padx=5)
+        self.lbl1.grid(row=0, column=2, sticky=W, pady=4, padx=5)
 
         lbl2 = Label(self, text=self.param2)
-        lbl2.grid(row=0, column=2, sticky=W, pady=4, padx=5)
+        lbl2.grid(row=0, column=3, sticky=W, pady=4, padx=5)
 
-        abtn = Button(self, text="Connect", command=self.onClick)
-        abtn.grid(row=1, column=0)
+        self.abtn = Button(self, text="Connect")
+        self.abtn.grid(row=1, column=0)
+
+        self.bbtn = Button(self, text="Disconnect", command=self.onClick)
+        self.bbtn.grid(row=1, column=1)
 
         cbtn = Button(self, text="Progress", command=self.runProgress)
-        cbtn.grid(row=1, column=1, pady=4)
+        cbtn.grid(row=1, column=2, pady=4)
 
         self.pbar = Progressbar(self, mode='indeterminate')
         self.pbar.grid(row=2, column=0, columnspan=3, sticky=W + E)
 
     def onClick(self):
-        self.param1.set('New text')
-        self.lbl1['foreground']='red'
-        # self.lbl1.config(text='New text')
-        # self.update_idletasks()
+        self.setGood()
+        # self.lbl0.config(image=self.img_good)
+        # self.lbl0.image = self.img_good
 
-    def runProgress(self):
-        if not self.status:
-            self.pbar.start()
-            self.status = True
-        else:
-            self.pbar.stop()
-            self.status = False
+
+    def runProgress(self, event, message):
+        self.pbar.start()
+
+    def stopProgress(self, event):
+        self.pbar.stop()
+
+    def setGood(self):
+        self.lbl0.config(image=self.img_good)
+        self.lbl0.image = self.img_good
+        self.abtn.config(state="disabled")
+        self.bbtn.config(state="normal")
+
+    def setBad(self):
+        self.lbl0.config(image=self.img_bad)
+        self.lbl0.image = self.img_bad
+        self.abtn.config(state="normal")
+        self.bbtn.config(state="disabled")
 
 
 class MainWindow(Toplevel):
@@ -71,6 +94,9 @@ class MainWindow(Toplevel):
 
         self.var = StringVar()
         self.var.set('Some text')
+
+        self.timeToUpdate = StringVar()
+        self.timeToUpdate.set('10')
 
         self.initUI()
 
@@ -89,17 +115,20 @@ class MainWindow(Toplevel):
         lbl = Label(frame1, textvariable=self.var)
         lbl.grid(row=0, column=0, sticky=W, pady=4, padx=5)
 
-        abtn = Button(frame1, text="Activate")
-        abtn.grid(row=1, column=3)
+        lbl3 = Label(frame1, textvariable=self.timeToUpdate)
+        lbl3.grid(row=0, column=3, sticky=W, pady=4, padx=5)
 
-        cbtn = Button(frame1, text="Close", command=self.onExit)
-        cbtn.grid(row=2, column=0, pady=4)
+        self.abtn = Button(frame1, text="Activate")
+        self.abtn.grid(row=1, column=3)
 
-        hbtn = Button(frame1, text="Help")
-        hbtn.grid(row=1, column=0, padx=5)
+        self.btn_exit = Button(frame1, text="Close", command=self.onExit)
+        self.btn_exit.grid(row=2, column=0, pady=4)
 
-        obtn = Button(frame1, text="OK", command=self.onTestClick)
-        obtn.grid(row=2, column=3)
+        self.hbtn = Button(frame1, text="Help")
+        self.hbtn.grid(row=1, column=0, padx=5)
+
+        self.obtn = Button(frame1, text="OK", command=self.onTestClick)
+        self.obtn.grid(row=2, column=3)
 
         # frames = []
         # for i in range(1, 4):

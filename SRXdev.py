@@ -1,4 +1,5 @@
 from pprint import pprint
+import time
 from jnpr.junos import Device
 from jnpr.junos.factory import loadyaml
 from jnpr.junos.utils.start_shell import StartShell
@@ -12,18 +13,26 @@ set system services netconf ssh
 """
 
 
-class SRXDevice():
+class SRXDevice:
     def __init__(self, name, address, un, passw):
         self.yml_file = "routeStatus.yml"
         globals().update(loadyaml(self.yml_file))
         self.dev = Device(host=address, user=un, passwd=passw)
         self.name = name
         self.version = ''
+        self.lastState = False
 
-    def connect(self):
+    def connect(self, fr):
         print(self.name, 'wait for connections')
         self.dev.open()
         print(self.name, 'connected!')
+        fr.event_generate('<<UpdateStop>>', when='tail')
+
+    def fake_connect(self, fr):
+        print('Begin fake connect')
+        time.sleep(3)
+        print('End fake connect')
+        fr.event_generate('<<UpdateStop>>', when='tail')
 
     def get_route(self):
         tbl = RouteTable(self.dev)
