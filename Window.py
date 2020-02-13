@@ -17,7 +17,8 @@ class SubFrame(Frame):
         self.name = name
         self.param1 = StringVar()
         self.param1.set(param1)
-        self.param2 = param2
+        self.param2 = StringVar()
+        self.param2.set(param2)
         self.status = False
 
         handler_start = partial(self.runProgress, message='Text')
@@ -39,28 +40,37 @@ class SubFrame(Frame):
 
         self.lbl0 = Label(self, image=self.img_bad)
         self.lbl0.image = self.img_bad
-        self.lbl0.grid(row=0, column=0, sticky=W, pady=4, padx=5)
+        self.lbl0.grid(row=0, column=0, rowspan=2, sticky=W, pady=4, padx=5)
 
         lbl = Label(self, text=self.name)
         lbl.grid(row=0, column=1, sticky=W, pady=4, padx=5)
 
-        self.lbl1 = Label(self, textvariable=self.param1, foreground="blue")
-        self.lbl1.grid(row=0, column=2, sticky=W, pady=4, padx=5)
+        self.lbl1a = Label(self, text='IP', foreground="blue", font='TkDefaultFont 12 bold')
+        self.lbl1a.grid(row=0, column=2, sticky=N, pady=4, padx=5)
 
-        lbl2 = Label(self, text=self.param2)
-        lbl2.grid(row=0, column=3, sticky=W, pady=4, padx=5)
+        self.lbl1 = Label(self, textvariable=self.param1, foreground="blue")
+        self.lbl1.grid(row=1, column=2, sticky=W, pady=4, padx=5)
+
+        self.lbl2a = Label(self, text='G/W', font='TkDefaultFont 12 bold')
+        self.lbl2a.grid(row=0, column=3, sticky=N, pady=4, padx=5)
+
+        self.lbl2 = Label(self, textvariable=self.param2)
+        self.lbl2.grid(row=1, column=3, sticky=W, pady=4, padx=5)
 
         self.abtn = Button(self, text="Connect")
-        self.abtn.grid(row=1, column=0)
+        self.abtn.grid(row=2, column=0)
 
         self.bbtn = Button(self, text="Disconnect", command=self.onClick)
-        self.bbtn.grid(row=1, column=1)
+        self.bbtn.grid(row=2, column=1)
 
-        cbtn = Button(self, text="Progress", command=self.runProgress)
-        cbtn.grid(row=1, column=2, pady=4)
+        self.cbtn = Button(self, text="Get GW", command=self.runProgress)
+        self.cbtn.grid(row=2, column=2, pady=4)
+
+        self.dbtn = Button(self, text="Res OSPF", command=self.onClick)
+        self.dbtn.grid(row=2, column=3, pady=4)
 
         self.pbar = Progressbar(self, mode='indeterminate')
-        self.pbar.grid(row=2, column=0, columnspan=3, sticky=W + E)
+        self.pbar.grid(row=3, column=0, columnspan=4, sticky=W + E)
 
     def onClick(self):
         self.setGood()
@@ -79,12 +89,16 @@ class SubFrame(Frame):
         self.lbl0.image = self.img_good
         self.abtn.config(state="disabled")
         self.bbtn.config(state="normal")
+        self.cbtn.config(state="normal")
+        self.dbtn.config(state="normal")
 
     def setBad(self):
         self.lbl0.config(image=self.img_bad)
         self.lbl0.image = self.img_bad
         self.abtn.config(state="normal")
         self.bbtn.config(state="disabled")
+        self.cbtn.config(state="disabled")
+        self.dbtn.config(state="disabled")
 
 
 class MainWindow(Toplevel):
@@ -118,7 +132,7 @@ class MainWindow(Toplevel):
         lbl3 = Label(frame1, textvariable=self.timeToUpdate)
         lbl3.grid(row=0, column=3, sticky=W, pady=4, padx=5)
 
-        self.abtn = Button(frame1, text="Activate")
+        self.abtn = Button(frame1, text='Connect all')
         self.abtn.grid(row=1, column=3)
 
         self.btn_exit = Button(frame1, text="Close", command=self.onExit)

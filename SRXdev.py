@@ -3,6 +3,7 @@ import time
 from jnpr.junos import Device
 from jnpr.junos.factory import loadyaml
 from jnpr.junos.utils.start_shell import StartShell
+from jnpr.junos.exception import *
 from multiprocessing.dummy import Process, Pool
 
 from config import username, password, SRXAddresses
@@ -22,23 +23,44 @@ class SRXDevice:
         self.version = ''
         self.lastState = False
 
-    def connect(self, fr):
+    def connect(self):
+        # ToDo ConnectTimeoutError
         print(self.name, 'wait for connections')
-        self.dev.open()
-        print(self.name, 'connected!')
-        fr.event_generate('<<UpdateStop>>', when='tail')
+        try:
+            self.dev.open()
+        except ConnectRefusedError:
+            print('Error: Connection refused!')
+            return False
+        except ConnectTimeoutError:
+            print('Connection timeout error!')
+            return False
+        except ConnectUnknownHostError:
+            print('Error: Connection attempt to unknown host')
+            return False
+        except ConnectionError:
+            print('Connection error!')
+            return False
+        except ConnectAuthError:
+            print('Connection authentication error!')
+            return False
+        else:
+            print(self.name, 'connected!')
+            return True
 
-    def fake_connect(self, fr):
+
+    def fake_connect(self):
         print('Begin fake connect')
         time.sleep(3)
         print('End fake connect')
-        fr.event_generate('<<UpdateStop>>', when='tail')
 
     def get_route(self):
         tbl = RouteTable(self.dev)
         tbl.get('192.168.0.0/24')
         for key in tbl:
+            result = key.to
             print(key.name, key.via, key.to)
+        return result
+        # fr.event_generate('<<UpdateStop>>', when='tail')
 
     def clear_ospf(self):
         ss = StartShell(self.dev)
