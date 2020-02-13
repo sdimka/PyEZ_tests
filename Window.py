@@ -100,6 +100,9 @@ class SubFrame(Frame):
         self.cbtn.config(state="disabled")
         self.dbtn.config(state="disabled")
 
+    def setError(self):
+        pass
+
 
 class MainWindow(Toplevel):
     def __init__(self, parent):

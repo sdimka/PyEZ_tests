@@ -22,9 +22,9 @@ class SRXDevice:
         self.name = name
         self.version = ''
         self.lastState = False
+        self.lastError = ''
 
     def connect(self):
-        # ToDo ConnectTimeoutError
         print(self.name, 'wait for connections')
         try:
             self.dev.open()
