@@ -40,22 +40,22 @@ class SubFrame(Frame):
 
         self.lbl0 = Label(self, image=self.img_bad)
         self.lbl0.image = self.img_bad
-        self.lbl0.grid(row=0, column=0, rowspan=2, sticky=W, pady=4, padx=5)
+        self.lbl0.grid(row=0, column=0, rowspan=2, sticky=W, pady=1, padx=5)
 
         lbl = Label(self, text=self.name)
-        lbl.grid(row=0, column=1, sticky=W, pady=4, padx=5)
+        lbl.grid(row=0, column=1, sticky=W, pady=1, padx=5)
 
         self.lbl1a = Label(self, text='IP', foreground="blue", font='TkDefaultFont 12 bold')
-        self.lbl1a.grid(row=0, column=2, sticky=N, pady=4, padx=5)
+        self.lbl1a.grid(row=0, column=2, sticky=N, pady=1, padx=5)
 
         self.lbl1 = Label(self, textvariable=self.param1, foreground="blue")
-        self.lbl1.grid(row=1, column=2, sticky=W, pady=4, padx=5)
+        self.lbl1.grid(row=1, column=2, sticky=W, pady=1, padx=5)
 
         self.lbl2a = Label(self, text='G/W', font='TkDefaultFont 12 bold')
-        self.lbl2a.grid(row=0, column=3, sticky=N, pady=4, padx=5)
+        self.lbl2a.grid(row=0, column=3, sticky=N, pady=1, padx=5)
 
         self.lbl2 = Label(self, textvariable=self.param2)
-        self.lbl2.grid(row=1, column=3, sticky=W, pady=4, padx=5)
+        self.lbl2.grid(row=1, column=3, sticky=W, pady=1, padx=5)
 
         self.abtn = Button(self, text="Connect")
         self.abtn.grid(row=2, column=0)
