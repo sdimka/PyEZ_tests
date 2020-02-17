@@ -25,28 +25,33 @@ class SRXDevice:
         self.lastError = ''
 
     def connect(self):
-        print(self.name, 'wait for connections')
+        # print(self.name, 'wait for connections')
         try:
             self.dev.open()
         except ConnectRefusedError:
-            print('Error: Connection refused!')
+            # print('Error: Connection refused!')
+            self.lastError = 'Error: Connection refused!'
             return False
         except ConnectTimeoutError:
-            print('Connection timeout error!')
+            # print('Connection timeout error!')
+            self.lastError = 'Connection timeout error!'
             return False
         except ConnectUnknownHostError:
-            print('Error: Connection attempt to unknown host')
+            # print('Error: Connection attempt to unknown host')
+            self.lastError = 'Error: Connection attempt to unknown host'
             return False
         except ConnectionError:
-            print('Connection error!')
+            # print('Connection error!')
+            self.lastError = 'Connection error!'
             return False
         except ConnectAuthError:
-            print('Connection authentication error!')
+            # print('Connection authentication error!')
+            self.lastError = 'Connection authentication error!'
             return False
         else:
-            print(self.name, 'connected!')
+            # print(self.name, 'connected!')
+            self.lastError = ''
             return True
-
 
     def fake_connect(self):
         print('Begin fake connect')
@@ -58,9 +63,8 @@ class SRXDevice:
         tbl.get('192.168.0.0/24')
         for key in tbl:
             result = key.to
-            print(key.name, key.via, key.to)
+            # print(key.name, key.via, key.to)
         return result
-        # fr.event_generate('<<UpdateStop>>', when='tail')
 
     def clear_ospf(self):
         ss = StartShell(self.dev)
@@ -73,7 +77,7 @@ class SRXDevice:
         self.version = ss.run('cli -c "show version"')
 
     def disconnect(self):
-        print('Close connection')
+        # print('Close connection')
         self.dev.close()
 
     def get_status(self):

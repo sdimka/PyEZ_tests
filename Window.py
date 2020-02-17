@@ -19,6 +19,8 @@ class SubFrame(Frame):
         self.param1.set(param1)
         self.param2 = StringVar()
         self.param2.set(param2)
+        self.param3 = StringVar()
+        # self.param3.set(param3)
         self.status = False
 
         handler_start = partial(self.runProgress, message='Text')
@@ -28,6 +30,8 @@ class SubFrame(Frame):
 
         self.img_bad = PhotoImage(file='bad.png')
         self.img_good = PhotoImage(file='good.png')
+        self.img_err = PhotoImage(file='bad_conn.png')
+        self.img_wrongGW = PhotoImage(file='error.png')
 
         self.initUI()
 
@@ -57,20 +61,26 @@ class SubFrame(Frame):
         self.lbl2 = Label(self, textvariable=self.param2)
         self.lbl2.grid(row=1, column=3, sticky=W, pady=1, padx=5)
 
+        self.lbl3a = Label(self, text='Last error:', font='TkDefaultFont 12 bold')
+        self.lbl3a.grid(row=0, column=4, sticky=N, pady=1, padx=5)
+
+        self.lbl3 = Label(self, textvariable=self.param3)
+        self.lbl3.grid(row=1, column=4, sticky=W, pady=1, padx=5)
+
         self.abtn = Button(self, text="Connect")
-        self.abtn.grid(row=2, column=0)
+        self.abtn.grid(row=0, column=5)
 
         self.bbtn = Button(self, text="Disconnect", command=self.onClick)
-        self.bbtn.grid(row=2, column=1)
+        self.bbtn.grid(row=0, column=6)
 
         self.cbtn = Button(self, text="Get GW", command=self.runProgress)
-        self.cbtn.grid(row=2, column=2, pady=4)
+        self.cbtn.grid(row=1, column=5, pady=4)
 
         self.dbtn = Button(self, text="Res OSPF", command=self.onClick)
-        self.dbtn.grid(row=2, column=3, pady=4)
+        self.dbtn.grid(row=1, column=6, pady=4)
 
         self.pbar = Progressbar(self, mode='indeterminate')
-        self.pbar.grid(row=3, column=0, columnspan=4, sticky=W + E)
+        self.pbar.grid(row=1, column=1, sticky=W + E)  # columnspan=4
 
     def onClick(self):
         self.setGood()
@@ -101,7 +111,20 @@ class SubFrame(Frame):
         self.dbtn.config(state="disabled")
 
     def setError(self):
-        pass
+        self.lbl0.config(image=self.img_err)
+        self.lbl0.image = self.img_err
+        self.abtn.config(state="normal")
+        self.bbtn.config(state="disabled")
+        self.cbtn.config(state="disabled")
+        self.dbtn.config(state="disabled")
+
+    def setWrongGW(self):
+        self.lbl0.config(image=self.img_wrongGW)
+        self.lbl0.image = self.img_wrongGW
+        self.abtn.config(state="disabled")
+        self.bbtn.config(state="normal")
+        self.cbtn.config(state="normal")
+        self.dbtn.config(state="normal")
 
 
 class MainWindow(Toplevel):
@@ -139,13 +162,13 @@ class MainWindow(Toplevel):
         self.abtn.grid(row=1, column=3)
 
         self.btn_exit = Button(frame1, text="Close", command=self.onExit)
-        self.btn_exit.grid(row=2, column=0, pady=4)
+        self.btn_exit.grid(row=1, column=4, pady=4)
 
         self.hbtn = Button(frame1, text="Help")
-        self.hbtn.grid(row=1, column=0, padx=5)
+        self.hbtn.grid(row=1, column=0, padx=1)
 
         self.obtn = Button(frame1, text="OK", command=self.onTestClick)
-        self.obtn.grid(row=2, column=3)
+        self.obtn.grid(row=1, column=2)
 
         # frames = []
         # for i in range(1, 4):

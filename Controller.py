@@ -45,10 +45,16 @@ class Controller(Tk):
     def dev_connect_tread(self, dev, fr):
         fr.event_generate('<<UpdateStart>>', when='tail')
         if dev.connect():
-            # ToDo if connect success, update dev.lastSate here
-            fr.param2.set(dev.get_route())
+            curr_gw = dev.get_route()
+            fr.param2.set(curr_gw)
             dev.lastState = True
-            fr.setGood()
+            if curr_gw.endswith('1'):
+                fr.setGood()
+            else:
+                fr.setWrongGW()
+        else:
+            fr.param3.set(dev.lastError)
+            fr.setError()
         fr.event_generate('<<UpdateStop>>', when='tail')
 
     def connect_device(self, dev, fr):
@@ -68,7 +74,12 @@ class Controller(Tk):
         fr.event_generate('<<UpdateStart>>', when='tail')
         dev.clear_ospf()
         time.sleep(15)
-        fr.param2.set(dev.get_route())
+        curr_gw = dev.get_route()
+        fr.param2.set(curr_gw)
+        if curr_gw.endswith('1'):
+            fr.setGood()
+        else:
+            fr.setWrongGW()
         fr.event_generate('<<UpdateStop>>', when='tail')
 
     def reset_ospf(self, dev, fr):
